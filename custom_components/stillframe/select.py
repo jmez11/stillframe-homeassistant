@@ -2,11 +2,27 @@
 from homeassistant.components.select import SelectEntity
 
 from .entity import StillframeEntity
+from .const import DISPLAY_MODES
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    async_add_entities([PowerSelect(entry.runtime_data, "power_mode", "Power mode"),
-                        AlbumSelect(entry.runtime_data, "album", "Album")])
+    entities = [PowerSelect(entry.runtime_data, "power_mode", "Power mode"),
+                AlbumSelect(entry.runtime_data, "album", "Album")]
+    if "display_mode" in entry.runtime_data.data["controls"]:
+        entities.append(DisplayModeSelect(entry.runtime_data, "display_mode", "Display mode"))
+    async_add_entities(entities)
+
+
+class DisplayModeSelect(StillframeEntity, SelectEntity):
+    _attr_options = list(DISPLAY_MODES.values())
+
+    @property
+    def current_option(self):
+        return DISPLAY_MODES.get(self.coordinator.data["display"].get("display_mode", "auto"))
+
+    async def async_select_option(self, option):
+        mode = next(key for key, label in DISPLAY_MODES.items() if label == option)
+        await self.coordinator.control(display_mode=mode, mode_schedule_enabled=False)
 
 
 class PowerSelect(StillframeEntity, SelectEntity):

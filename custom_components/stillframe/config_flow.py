@@ -8,7 +8,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers import selector
 
 from .api import StillframeAuthError, StillframeClient, StillframeError
-from .const import DOMAIN
+from .const import DOMAIN, DISPLAY_MODES
 
 
 class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -95,7 +95,55 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 class StillframeOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
-        return self.async_show_menu(step_id="init", menu_options=["add_period", "edit_periods"])
+        menu = ["add_period", "edit_periods"]
+        if "mode_periods" in self.config_entry.runtime_data.data["controls"]:
+            menu += ["add_mode_period", "edit_mode_periods"]
+        return self.async_show_menu(step_id="init", menu_options=menu)
+
+    async def async_step_add_mode_period(self, user_input=None):
+        coordinator = self.config_entry.runtime_data
+        errors = {}
+        if user_input is not None:
+            from homeassistant.exceptions import HomeAssistantError
+            period = {"start": user_input["start"][:5], "end": user_input["end"][:5],
+                      "display_mode": user_input["display_mode"]}
+            try:
+                await coordinator.control(mode_periods=coordinator.data["controls"]["mode_periods"] + [period],
+                                          mode_schedule_enabled=True)
+            except HomeAssistantError:
+                errors["base"] = "cannot_save"
+            else:
+                return self.async_create_entry(title="", data={})
+        return self.async_show_form(step_id="add_mode_period", data_schema=vol.Schema({
+            vol.Required("start", default="08:00:00"): selector.TimeSelector(),
+            vol.Required("end", default="17:00:00"): selector.TimeSelector(),
+            vol.Required("display_mode", default="fullscreen"): selector.SelectSelector(
+                selector.SelectSelectorConfig(options=[{"value": key, "label": label}
+                    for key, label in DISPLAY_MODES.items()], mode=selector.SelectSelectorMode.DROPDOWN)),
+        }), errors=errors)
+
+    async def async_step_edit_mode_periods(self, user_input=None):
+        coordinator = self.config_entry.runtime_data
+        errors = {}
+        if user_input is not None:
+            try:
+                periods = json.loads(user_input["periods"])
+                if not isinstance(periods, list):
+                    raise ValueError
+                await coordinator.control(mode_periods=periods, mode_schedule_enabled=True)
+            except (ValueError, TypeError):
+                errors["base"] = "invalid_periods"
+            except Exception as error:
+                from homeassistant.exceptions import HomeAssistantError
+                if not isinstance(error, HomeAssistantError):
+                    raise
+                errors["base"] = "cannot_save"
+            else:
+                return self.async_create_entry(title="", data={})
+        return self.async_show_form(step_id="edit_mode_periods", data_schema=vol.Schema({
+            vol.Required("periods", default=json.dumps(coordinator.data["controls"]["mode_periods"], indent=2)):
+                selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
+        }), errors=errors)
 
     async def async_step_add_period(self, user_input=None):
         coordinator = self.config_entry.runtime_data

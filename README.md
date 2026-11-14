@@ -1,5 +1,7 @@
 # Stillframe for Home Assistant
 
+<img src="custom_components/stillframe/brand/icon.png" alt="Stillframe" width="96" height="96">
+
 A HACS custom integration for local control of Stillframe photo frames. Each frame
 is a Home Assistant device. The integration communicates with its LAN API rather
 than reading another project's files or accessing Google Photos directly.
@@ -14,6 +16,7 @@ they are not yet supported or modified by this project.
 - Display switch for on-demand control from dashboards, actions and automation triggers.
 - Daily on/off times, including overnight hours, in the frame's timezone.
 - Album selection and daily periods containing one or several already synced albums.
+- Scheduled display modes with independent periods for Fullscreen, Side by side, Mosaic, Collage and Photo pile.
 - Cached/discovered photo counts, cache size, playback buffer, sync status and per-album progress.
 - Stable device and entity IDs across address changes and reboots.
 
@@ -80,6 +83,34 @@ initially this is all enabled sources. Album periods and power hours run on the
 frame and continue through Home Assistant outages. The display's existing
 Google/local enable settings still apply.
 
+## Display mode schedules
+
+In **Configure**, choose **Add display mode period**, set start/end times, choose
+a mode and save. Repeat for more periods. **Edit display mode periods** lets you
+edit or remove the complete list. Mode schedules use the same frame timezone as
+album schedules, support overnight periods and continue when HA is offline.
+Periods cannot overlap within the mode schedule, but mode and album periods
+can overlap freely.
+
+Use **Display mode** on the device page for an immediate change. That disables
+the **Display mode schedule** switch; enable it again to resume scheduled modes.
+**Frame settings** uses the frame's existing layout and automatic mode rotation.
+Outside mode periods, the frame uses the last manual mode selection, initially
+**Frame settings**. Your native frame preferences are preserved.
+
+Example mode periods:
+
+```json
+[
+  {"start": "08:00", "end": "17:00", "display_mode": "mosaic"},
+  {"start": "17:00", "end": "22:00", "display_mode": "fullscreen"}
+]
+```
+
+Mode scheduling requires the updated Pi LAN API with the `mode_schedules`
+capability. On older frames the existing album/power controls remain available;
+update the frame and reload the integration to expose mode controls.
+
 ## Automation examples
 
 Use your frame's actual entity IDs from its device page:
@@ -108,6 +139,10 @@ data:
       end: "17:00"
       album_ids: ["local"]
 ```
+
+The `stillframe.set_mode_periods` action uses the same target and a `periods`
+list with `start`, `end`, and `display_mode`. Supported mode IDs are `auto`,
+`fullscreen`, `side_by_side`, `mosaic`, `collage`, and `pile`.
 
 Settings persist on the appliance. Unloading/removing the integration leaves the
 saved frame schedule in effect. Entity state refreshes every 30 seconds; commands

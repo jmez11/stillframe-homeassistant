@@ -40,10 +40,12 @@
         }
       },
       "init": {
-        "title": "Album schedules",
+        "title": "Album and display mode schedules",
         "menu_options": {
           "add_period": "Add album period",
-          "edit_periods": "Edit periods and timezone"
+          "edit_periods": "Edit periods and timezone",
+          "add_mode_period": "Add display mode period",
+          "edit_mode_periods": "Edit display mode periods"
         }
       },
       "add_period": {
@@ -54,11 +56,27 @@
           "end": "End time",
           "album_ids": "Albums"
         }
+      },
+      "add_mode_period": {
+        "title": "Add display mode period",
+        "description": "Choose when to use a display mode. Times use the frame timezone. Mode periods cannot overlap each other; they can overlap album periods. Frame settings follows the frame’s existing layout and automatic rotation preferences.",
+        "data": {
+          "start": "Start time",
+          "end": "End time",
+          "display_mode": "Display mode"
+        }
+      },
+      "edit_mode_periods": {
+        "title": "Edit display mode periods",
+        "description": "Use a JSON list of periods with start, end and display_mode. Modes: auto, fullscreen, side_by_side, mosaic, collage, pile. See the repository README for an example. Set the frame timezone under Edit periods and timezone.",
+        "data": {
+          "periods": "Daily display mode periods (JSON)"
+        }
       }
     },
     "error": {
       "invalid_periods": "Enter a JSON list of periods.",
-      "cannot_save": "Could not save. Check the connection, HH:MM times, album IDs and that periods do not overlap."
+      "cannot_save": "Could not save. Check the connection, HH:MM times, album IDs or display modes, and that periods within each schedule do not overlap."
     }
   }
 }

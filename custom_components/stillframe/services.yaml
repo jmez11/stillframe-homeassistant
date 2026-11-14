@@ -12,3 +12,17 @@ set_album_periods:
       example: [{start: "08:00", end: "17:00", album_ids: ["local"]}]
       selector:
         object:
+set_mode_periods:
+  name: Set display mode periods
+  description: Save daily display mode periods on the frame and enable its mode schedule. Times use the frame timezone.
+  target:
+    entity:
+      integration: stillframe
+  fields:
+    periods:
+      name: Periods
+      description: 'A list of {start: "HH:MM", end: "HH:MM", display_mode: "fullscreen"}. Modes are auto, fullscreen, side_by_side, mosaic, collage, or pile. Periods cannot overlap.'
+      required: true
+      example: [{start: "08:00", end: "17:00", display_mode: "mosaic"}]
+      selector:
+        object:

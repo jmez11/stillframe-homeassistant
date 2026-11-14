@@ -1,5 +1,6 @@
 """Stillframe local integration, shared across Stillframe implementations."""
 import voluptuous as vol
+from functools import partial
 
 from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
 from homeassistant.helpers import config_validation as cv
@@ -21,18 +22,23 @@ async def async_setup_entry(hass, entry):
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    if not hass.services.has_service(DOMAIN, "set_album_periods"):
-        async def set_periods(call):
-            entries = await async_extract_config_entry_ids(call)
-            targets = [e for e in hass.config_entries.async_entries(DOMAIN)
-                       if e.entry_id in entries and e.state.value == "loaded"]
-            if not targets:
-                raise HomeAssistantError("Target at least one loaded Stillframe device or entity")
-            for target in targets:
-                await target.runtime_data.control(album_periods=call.data["periods"],
-                                                  album_schedule_enabled=True)
 
-        hass.services.async_register(DOMAIN, "set_album_periods", set_periods, schema=vol.Schema({
+    async def set_periods(call, *, kind):
+        entries = await async_extract_config_entry_ids(call)
+        targets = [e for e in hass.config_entries.async_entries(DOMAIN)
+                   if e.entry_id in entries and e.state.value == "loaded"]
+        if not targets:
+            raise HomeAssistantError("Target at least one loaded Stillframe device or entity")
+        for target in targets:
+            if f"{kind}_periods" not in target.runtime_data.data["controls"]:
+                raise HomeAssistantError("Update this frame's LAN API to support display mode schedules")
+            await target.runtime_data.control(**{f"{kind}_periods": call.data["periods"],
+                                                f"{kind}_schedule_enabled": True})
+
+    for kind in ("album", "mode"):
+        if hass.services.has_service(DOMAIN, f"set_{kind}_periods"):
+            continue
+        hass.services.async_register(DOMAIN, f"set_{kind}_periods", partial(set_periods, kind=kind), schema=vol.Schema({
             vol.Optional("entity_id"): cv.entity_ids,
             vol.Optional("device_id"): vol.All(cv.ensure_list, [cv.string]),
             vol.Optional("area_id"): vol.All(cv.ensure_list, [cv.string]),
@@ -46,4 +52,5 @@ async def async_unload_entry(hass, entry):
     if unloaded and not any(e.entry_id != entry.entry_id and e.state.value == "loaded"
                             for e in hass.config_entries.async_entries(DOMAIN)):
         hass.services.async_remove(DOMAIN, "set_album_periods")
+        hass.services.async_remove(DOMAIN, "set_mode_periods")
     return unloaded

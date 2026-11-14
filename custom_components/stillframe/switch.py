@@ -5,8 +5,11 @@ from .entity import StillframeEntity
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    async_add_entities([StillframeSwitch(entry.runtime_data, "power", "Display"),
-                        StillframeSwitch(entry.runtime_data, "album_schedule_enabled", "Album schedule")])
+    entities = [StillframeSwitch(entry.runtime_data, "power", "Display"),
+                StillframeSwitch(entry.runtime_data, "album_schedule_enabled", "Album schedule")]
+    if "mode_schedule_enabled" in entry.runtime_data.data["controls"]:
+        entities.append(StillframeSwitch(entry.runtime_data, "mode_schedule_enabled", "Display mode schedule"))
+    async_add_entities(entities)
 
 
 class StillframeSwitch(StillframeEntity, SwitchEntity):

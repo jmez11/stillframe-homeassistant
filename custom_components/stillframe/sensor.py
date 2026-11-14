@@ -44,6 +44,7 @@ class AlbumStatus(StillframeEntity, SensorEntity):
     def extra_state_attributes(self):
         return {"albums": self.coordinator.data["albums"],
                 "periods": self.coordinator.data["controls"]["album_periods"],
+                "mode_periods": self.coordinator.data["controls"].get("mode_periods", []),
                 "timezone": self.coordinator.data["controls"]["timezone"],
                 "cache_updated_at": self.coordinator.data["cache"].get("updated_at"),
                 "display_reported": self.coordinator.data["display"].get("reported", {})}

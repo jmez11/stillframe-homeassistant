@@ -69,6 +69,9 @@ Supported fields:
 | `album_ids` | Unique IDs of already synced albums; empty means all enabled sources |
 | `album_schedule_enabled` | Boolean; disable for immediate manual selection |
 | `album_periods` | Up to 24 non-overlapping daily `{start,end,album_ids}` objects |
+| `display_mode` | `auto` preserves native preferences; otherwise `fullscreen`, `side_by_side`, `mosaic`, `collage`, or `pile` |
+| `mode_schedule_enabled` | Boolean; disable for immediate manual mode selection |
+| `mode_periods` | Up to 24 non-overlapping daily `{start,end,display_mode}` objects |
 
 Album periods use the frame timezone and take precedence over base `album_ids`
 when enabled. Gaps use base selection. Equal period start/end means all day.
@@ -80,3 +83,16 @@ a specifically selected album. An empty selection may play the combined feed.
 
 Display power means display sleep/wake, not shutting down the device. Off must
 override setup/pairing prompts. Scheduling and controls must survive HA outages.
+
+Frames supporting mode schedules advertise `capabilities.mode_schedules: true`
+and list their supported IDs in `capabilities.display_modes`. The three mode
+control fields are an optional, backward-compatible extension to API v1.
+`display.display_mode` is the effective policy (`auto` or a fixed mode), while
+`display.layout` is the effective base layout and `display.reported.display_mode`
+is the renderer's actual active layout.
+
+Mode periods use the frame timezone and take precedence over base `display_mode`
+while enabled. Gaps use the base mode. A fixed mode suppresses native random
+mode rotation for its duration; `auto` restores native layout/rotation without
+overwriting those settings. Mode and album schedules are validated separately,
+so their periods may overlap each other.

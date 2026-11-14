@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stillframe-homeassistant"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local Stillframe frame control for Home Assistant"
 requires-python = ">=3.13"
 
@@ -15,7 +15,7 @@ test = ["aiohttp>=3.11", "pytest>=8", "pytest-asyncio>=1", "ruff"]
 include = ["custom_components.stillframe*"]
 
 [tool.setuptools.package-data]
-"custom_components.stillframe" = ["*.json", "*.yaml", "translations/*.json"]
+"custom_components.stillframe" = ["*.json", "*.yaml", "translations/*.json", "brand/*.png"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
