@@ -33,7 +33,7 @@
     "step": {
       "edit_periods": {
         "title": "Album periods and timezone",
-        "description": "Use a JSON list of periods with start, end and album_ids. Example: [{\"start\":\"08:00\",\"end\":\"17:00\",\"album_ids\":[\"local\"]}]. Empty IDs means all enabled sources. Available albums: {albums}",
+        "description": "Use a JSON list of periods with start, end and album_ids. See the repository README for an example. Empty IDs means all enabled sources. Available albums: {albums}",
         "data": {
           "timezone": "Frame timezone",
           "periods": "Daily album periods (JSON)"
