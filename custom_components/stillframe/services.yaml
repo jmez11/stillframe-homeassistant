@@ -1,0 +1,14 @@
+set_album_periods:
+  name: Set album periods
+  description: Save daily album periods on the frame and enable its album schedule. Times use the frame timezone. Empty album_ids plays all enabled sources.
+  target:
+    entity:
+      integration: stillframe
+  fields:
+    periods:
+      name: Periods
+      description: 'A list of {start: "HH:MM", end: "HH:MM", album_ids: ["album ID"]}. Periods cannot overlap; overnight periods are supported.'
+      required: true
+      example: [{start: "08:00", end: "17:00", album_ids: ["local"]}]
+      selector:
+        object:

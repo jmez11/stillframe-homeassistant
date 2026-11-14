@@ -1,0 +1,64 @@
+{
+  "title": "Stillframe",
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Connect Stillframe",
+        "description": "Enter the frame's web address and device credentials. The frame must support Stillframe LAN API v1.",
+        "data": {
+          "url": "Frame URL",
+          "username": "Username",
+          "password": "Frame password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Update frame password",
+        "data": {
+          "password": "Frame password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The frame rejected these credentials.",
+      "cannot_connect": "Cannot connect. Check the address, network and that the frame has LAN API v1 firmware."
+    },
+    "abort": {
+      "already_configured": "This frame is already configured.",
+      "wrong_device": "The address now belongs to a different frame.",
+      "reauth_successful": "Frame password updated."
+    }
+  },
+  "options": {
+    "step": {
+      "edit_periods": {
+        "title": "Album periods and timezone",
+        "description": "Use a JSON list of periods with start, end and album_ids. Example: [{\"start\":\"08:00\",\"end\":\"17:00\",\"album_ids\":[\"local\"]}]. Empty IDs means all enabled sources. Available albums: {albums}",
+        "data": {
+          "timezone": "Frame timezone",
+          "periods": "Daily album periods (JSON)"
+        }
+      },
+      "init": {
+        "title": "Album schedules",
+        "menu_options": {
+          "add_period": "Add album period",
+          "edit_periods": "Edit periods and timezone"
+        }
+      },
+      "add_period": {
+        "title": "Add album period",
+        "description": "Choose albums already synced to this frame. Leave albums empty for all enabled sources. Times use the frame timezone; periods cannot overlap.",
+        "data": {
+          "start": "Start time",
+          "end": "End time",
+          "album_ids": "Albums"
+        }
+      }
+    },
+    "error": {
+      "invalid_periods": "Enter a JSON list of periods.",
+      "cannot_save": "Could not save. Check the connection, HH:MM times, album IDs and that periods do not overlap."
+    }
+  }
+}

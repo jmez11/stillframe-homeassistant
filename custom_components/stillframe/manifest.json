@@ -1,0 +1,13 @@
+{
+  "domain": "stillframe",
+  "name": "Stillframe",
+  "codeowners": ["@jmez11"],
+  "config_flow": true,
+  "documentation": "https://github.com/jmez11/stillframe-homeassistant",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/jmez11/stillframe-homeassistant/issues",
+  "requirements": [],
+  "version": "0.1.0",
+  "zeroconf": ["_stillframe._tcp.local."]
+}
