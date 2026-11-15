@@ -1,5 +1,6 @@
 """Daily hours and advanced schedule controls."""
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.exceptions import HomeAssistantError
 
 from .entity import StillframeEntity
 from homeassistant.helpers.entity import EntityCategory
@@ -27,18 +28,20 @@ class StillframeSwitch(StillframeEntity, SwitchEntity):
         self.key = key
         self._attr_entity_category = EntityCategory.CONFIG
 
-    @property
-    def available(self):
-        if self.key in ("album_schedule_enabled", "mode_schedule_enabled"):
-            periods = "album_periods" if self.key.startswith("album") else "mode_periods"
-            return super().available and bool(self.coordinator.data["controls"].get(periods))
-        return super().available
+    def schedule_configured(self):
+        if self.key == "daily_hours_enabled":
+            return True
+        periods = "album_periods" if self.key.startswith("album") else "mode_periods"
+        return bool(self.coordinator.data["controls"].get(periods))
 
     @property
     def is_on(self):
-        return self.coordinator.data["controls"][self.key]
+        return self.schedule_configured() and self.coordinator.data["controls"][self.key]
 
     async def async_turn_on(self, **kwargs):
+        if not self.schedule_configured():
+            kind = "album" if self.key.startswith("album") else "display mode"
+            raise HomeAssistantError(f"Add a {kind} period first: Settings > Devices & services > Stillframe > Configure")
         await self.coordinator.control(**{self.key: True})
 
     async def async_turn_off(self, **kwargs):
@@ -51,6 +54,7 @@ class StillframeSwitch(StillframeEntity, SwitchEntity):
                     "effect": "On uses saved times. Off removes the time restriction; it does not stop photos.",
                     "priority": "Keep playing or Keep stopped takes priority until Follow daily hours is selected",
                     "saved_times": "Start and stop times are retained when switched off", "shared_with": "Frame app"}
-        return {"status": "Configured" if self.key == "daily_hours_enabled" or self.coordinator.data["controls"].get("album_periods" if self.key.startswith("album") else "mode_periods") else "Not configured; add periods in Home Assistant",
+        return {"status": "Configured" if self.schedule_configured() else "Not configured; add periods in Home Assistant",
+                "setup": "Settings > Devices & services > Stillframe > Configure",
                 "configured_in": "App or Home Assistant" if self.key == "daily_hours_enabled" else "Home Assistant",
                 "runs_on": "Frame; continues while Home Assistant is offline"}

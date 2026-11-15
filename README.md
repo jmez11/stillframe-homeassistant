@@ -78,6 +78,8 @@ against the authenticated device ID before updating a configured frame's address
 
 Open **Configure** on the Stillframe integration, choose **Add album period**,
 select start/end times and choose one or several albums. Overnight periods work.
+This works on Android and Pi. Until periods are added, the schedule switch is
+Off with a Not configured status; Unavailable means the frame cannot be reached.
 An empty album selection means all enabled sources, including local uploads.
 Periods cannot overlap. **Edit periods and timezone** exposes the complete JSON
 list for editing/removing periods and the frame's IANA timezone.
