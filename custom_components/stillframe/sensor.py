@@ -14,7 +14,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         ("buffer_percent", "Playback buffer", "%"), ("bytes", "Photo cache size", "B"),
         ("status", "Sync status", None),
     )] + [AlbumStatus(coordinator)] + [ControlStatus(coordinator, key, name) for key, name in (
-        ("playback", "Playback control status"), ("albums", "Album control status"),
+        ("playback", "Playback control status"), ("daily_hours", "Daily hours status"), ("albums", "Album control status"),
         ("display_mode", "Display mode control status"), ("showing", "Photos showing"),
     )])
 
@@ -77,11 +77,13 @@ class ControlStatus(StillframeEntity, SensorEntity):
             return {"requested_on": state["display"]["requested_on"],
                     "reported_at": state["display"].get("reported", {}).get("at"),
                     "meaning": "Photo playback, not confirmation of TV panel power"}
-        if self.key == "playback":
+        if self.key in ("playback", "daily_hours"):
             return {"daily_hours_enabled": daily_hours_enabled(state), "saved_start": p["active_start"],
                     "saved_end": p["active_end"], "timezone": p["timezone"],
                     "managed_in": "Shared frame setting; editable in the app or Home Assistant",
-                    "override": p["power"] != "auto", "resume": "Resume daily hours"}
+                    "override": p["power"] != "auto", "resume": "Follow daily hours",
+                    "daily_hours_status": control_summary(state)["daily_hours"],
+                    "rule": "Keep playing/stopped overrides daily hours. When daily hours are off, photos may play at any time."}
         return {"configured_in": "Home Assistant", "runs_on": "Frame, including while Home Assistant is offline",
                 "resume": "Resume album schedule" if self.key == "albums" else "Resume display mode schedule",
                 "google_sources_managed_in": "Google Photos"}

@@ -12,25 +12,33 @@ Supports **Stillframe Pi OS** and **Stillframe Daydream** through the shared
 ## Features
 
 - Automatic mDNS discovery (`_stillframe._tcp.local.`), with manual URL setup as a fallback.
-- Display switch for on-demand control from dashboards, actions and automation triggers.
+- Playback selector for daily hours or persistent Keep playing / Keep stopped choices.
 - Daily on/off times, including overnight hours, in the frame's timezone.
 - Album selection and daily periods containing one or several already synced albums.
 - Scheduled display modes with independent periods for Fullscreen, Side by side, Mosaic, Collage and Photo pile.
 - Cached/discovered photo counts, cache size, playback buffer, sync status and per-album progress.
 - Stable device and entity IDs across address changes and reboots.
 
-Power commands control display standby, leaving the Pi and photo synchronization
-running. On/off commands persist as overrides. Select `auto` in **Power mode** or
-press **Resume power schedule** to return to daily hours. Equal on/off times mean
-the display is active all day.
+**Playback control** offers **Follow daily hours**, **Keep playing**, and
+**Keep stopped**. The two Keep choices ignore daily hours until you select
+**Follow daily hours** again. This controls photos and Pi display standby;
+Android controls TV panel sleep. Equal start/stop times allow playback all day.
+The old display switch is hidden but retained for existing automations.
 
 Album selection affects playback only. Every selected Google source continues to
 sync and retain its cache. Google album authorization/selection remains on the
 frame's existing Google setup page. Home Assistant does not manage Google credentials.
 
+Playback control has three choices: Follow daily hours, Keep playing, and
+Keep stopped. Keep playing/stopped takes priority until Follow daily hours is
+selected. Use daily hours only applies the saved start/stop times; turning it
+off removes the time restriction and does not stop photos. Saved times remain.
+The separate Daily hours status shows whether the hours are in use, off, or
+paused by an override. Photos showing reports actual playback separately.
+
 Daily hours are one shared setting: edit the same saved times and enabled state
 in the app or Home Assistant. Turning daily hours off keeps the saved times.
-Keep on/off is an explicit playback override until Resume daily hours is used.
+Keep playing/stopped is an explicit override until Follow daily hours is selected.
 Album and display mode schedules are configured only in Home Assistant, saved
 on the frame, and continue while HA is offline. Status shows what is controlling
 each setting; Resume actions restore paused schedules. Google Photos controls
@@ -134,9 +142,11 @@ triggers:
     entity_id: binary_sensor.living_room_motion
     to: "on"
 actions:
-  - action: switch.turn_on
+  - action: select.select_option
     target:
-      entity_id: switch.stillframe_display
+      entity_id: select.stillframe_power_mode
+    data:
+      option: "on"
 ```
 
 Set album periods from **Developer tools → Actions**:
@@ -158,8 +168,7 @@ list with `start`, `end`, and `display_mode`. Supported mode IDs are `auto`,
 
 Settings persist on the appliance. Unloading/removing the integration leaves the
 saved frame schedule in effect. Entity state refreshes every 30 seconds; commands
-refresh immediately from the frame's response. The display switch represents
-requested power. The **Album cache** attributes include the renderer's reported
+refresh immediately from the frame's response. Playback control represents the requested policy, while Photos showing reports actual playback. The **Album cache** attributes include the renderer's reported
 power and timestamp for hardware troubleshooting.
 
 Cache statistics refresh in a background snapshot on the frame so catalog scans

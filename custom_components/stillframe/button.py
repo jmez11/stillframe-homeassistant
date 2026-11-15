@@ -5,7 +5,7 @@ from .entity import StillframeEntity
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    entities = [ResumeButton(entry.runtime_data, "resume_schedule", "Resume daily hours")]
+    entities = [ResumeButton(entry.runtime_data, "resume_schedule", "Follow daily hours")]
     for kind, name in (("album", "Resume album schedule"), ("mode", "Resume display mode schedule")):
         if f"{kind}_periods" in entry.runtime_data.data["controls"]:
             entities.append(ResumeAdvanced(entry.runtime_data, kind, name))

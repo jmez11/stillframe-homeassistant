@@ -3,7 +3,7 @@ from datetime import time
 from homeassistant.components.time import TimeEntity
 
 from .entity import StillframeEntity
-from .policy import daily_hours_enabled
+from .policy import daily_hours_enabled, control_summary
 from homeassistant.helpers.entity import EntityCategory
 
 
@@ -33,4 +33,5 @@ class StillframeTime(StillframeEntity, TimeEntity):
         p = self.coordinator.data["controls"]
         return {"managed_in": "Shared with the frame app", "timezone": p["timezone"],
                 "in_effect": daily_hours_enabled(self.coordinator.data) and p["power"] == "auto",
-                "note": "Saved times are kept while daily hours are disabled or overridden"}
+                "daily_hours_status": control_summary(self.coordinator.data)["daily_hours"],
+                "note": "These saved times apply only when Use daily hours is on and Playback control is Follow daily hours"}

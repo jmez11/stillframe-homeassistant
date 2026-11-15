@@ -87,8 +87,8 @@
         "name": "Playback control",
         "state": {
           "auto": "Follow daily hours",
-          "on": "Keep on",
-          "off": "Keep off"
+          "on": "Keep playing",
+          "off": "Keep stopped"
         }
       }
     }

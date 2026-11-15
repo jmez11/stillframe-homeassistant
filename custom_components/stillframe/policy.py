@@ -11,8 +11,12 @@ def daily_hours_enabled(state):
 def control_summary(state, now=None):
     p = state["controls"]
     power = p["power"]
-    result = {"playback": f"Manual override: keep {power}" if power != "auto" else
-              "Following daily hours" if daily_hours_enabled(state) else "Daily hours disabled"}
+    enabled = daily_hours_enabled(state)
+    choice = "Keep playing" if power == "on" else "Keep stopped"
+    result = {"playback": f"{choice} - manual override" if power != "auto" else
+              "Following daily hours" if enabled else "Any time - daily hours off",
+              "daily_hours": (f"Paused - {choice} is active" if enabled else f"Off - {choice} still applies")
+              if power != "auto" else "Following saved times" if enabled else "Off - photos may play at any time"}
     current = now or datetime.now().astimezone()
     zone = p.get("timezone")
     try:
@@ -32,7 +36,8 @@ def control_summary(state, now=None):
         result[key] = ("Following Home Assistant schedule" if enabled and active else
                        "Manual selection; HA schedule paused" if periods and not enabled else
                        "Home Assistant selection" if selected else fallback)
-    result.update(state.get("display", {}).get("control_sources", {}))
+    reported_sources = state.get("display", {}).get("control_sources", {})
+    result.update({key: reported_sources[key] for key in ("albums", "display_mode") if key in reported_sources})
     reported = state.get("display", {}).get("reported", {})
     stamp = reported.get("at")
     recent = isinstance(stamp, (float, int)) and -10 <= current.timestamp() - stamp <= 90
