@@ -78,6 +78,8 @@ counts, discovered totals, percentages and discovery state. Totals describe the
 media discovered so far, not a guaranteed Google library total. A 100% cache
 percentage does not establish that discovery is complete.
 
+Albums are checked separately. With Highlights selected, Google also sends a mix of your selections. Photos not yet matched to an album may be Highlights or album photos. With Highlights alone, all returned photos are Highlights.
+
 Choosing **Album** manually disables **Album schedule** until you enable it again.
 Outside configured periods the frame uses the last manual album selection;
 initially this is all enabled sources. Album periods and power hours run on the

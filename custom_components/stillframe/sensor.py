@@ -2,6 +2,7 @@
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.helpers.entity import EntityCategory
 
+from .const import PHOTO_SOURCE_EXPLANATION
 from .entity import StillframeEntity
 
 
@@ -29,6 +30,10 @@ class CacheSensor(StillframeEntity, SensorEntity):
         value = self.coordinator.data["cache"].get(self.key)
         return value[:255] if isinstance(value, str) else value
 
+    @property
+    def extra_state_attributes(self):
+        return {"photo_sources": PHOTO_SOURCE_EXPLANATION} if self.key == "status" else None
+
 
 class AlbumStatus(StillframeEntity, SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -42,7 +47,8 @@ class AlbumStatus(StillframeEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        return {"albums": self.coordinator.data["albums"],
+        return {"photo_sources": PHOTO_SOURCE_EXPLANATION,
+                "albums": self.coordinator.data["albums"],
                 "periods": self.coordinator.data["controls"]["album_periods"],
                 "mode_periods": self.coordinator.data["controls"].get("mode_periods", []),
                 "timezone": self.coordinator.data["controls"]["timezone"],
