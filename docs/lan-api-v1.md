@@ -99,3 +99,20 @@ while enabled. Gaps use the base mode. A fixed mode suppresses native random
 mode rotation for its duration; `auto` restores native layout/rotation without
 overwriting those settings. Mode and album schedules are validated separately,
 so their periods may overlap each other.
+
+## Shared daily hours and control ownership
+
+Frames advertise `capabilities.shared_daily_hours: true` and expose the boolean
+`controls.daily_hours_enabled`. The same times, enabled state and timezone are
+used by native settings and HA. Disabled hours retain saved times. Manual power
+on/off overrides the hours until `power: auto` is restored. Older frames omit
+the flag; HA shows legacy hours but does not offer an unsupported enable switch.
+When writing saved times, modern clients also send the current enabled state;
+legacy time-only writes enable daily hours for backward compatibility.
+
+`display.control_sources` describes effective playback, album and display-mode
+control in plain language. Advanced schedules are configured in HA and executed
+on the frame. Manual album/mode choices pause their schedule; resuming enables
+it without replacing saved periods. Gaps use the saved base selection/settings.
+Native Android migration adopts effective HA hours only while HA access is
+enabled, removes the separate copy and preserves explicit power overrides.

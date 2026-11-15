@@ -28,6 +28,15 @@ Album selection affects playback only. Every selected Google source continues to
 sync and retain its cache. Google album authorization/selection remains on the
 frame's existing Google setup page. Home Assistant does not manage Google credentials.
 
+Daily hours are one shared setting: edit the same saved times and enabled state
+in the app or Home Assistant. Turning daily hours off keeps the saved times.
+Keep on/off is an explicit playback override until Resume daily hours is used.
+Album and display mode schedules are configured only in Home Assistant, saved
+on the frame, and continue while HA is offline. Status shows what is controlling
+each setting; Resume actions restore paused schedules. Google Photos controls
+which sources are available. Photos showing is reported separately from the
+requested playback state; it does not confirm TV panel power.
+
 ## Install
 
 Requires Home Assistant 2026.9 or newer and a frame running the LAN API v1 changes

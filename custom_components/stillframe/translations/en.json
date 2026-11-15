@@ -41,13 +41,14 @@
         }
       },
       "init": {
-        "title": "Album and display mode schedules",
+        "title": "Advanced schedules (Home Assistant)",
         "menu_options": {
           "add_period": "Add album period",
           "edit_periods": "Edit periods and timezone",
           "add_mode_period": "Add display mode period",
           "edit_mode_periods": "Edit display mode periods"
-        }
+        },
+        "description": "Configure album and display mode schedules here. They are saved and run on the frame, even while Home Assistant is offline. Daily hours are shared with the app; edit them on the device page."
       },
       "add_period": {
         "title": "Add album period",
@@ -78,6 +79,18 @@
     "error": {
       "invalid_periods": "Enter a JSON list of periods.",
       "cannot_save": "Could not save. Check the connection, HH:MM times, album IDs or display modes, and that periods within each schedule do not overlap."
+    }
+  },
+  "entity": {
+    "select": {
+      "playback_control": {
+        "name": "Playback control",
+        "state": {
+          "auto": "Follow daily hours",
+          "on": "Keep on",
+          "off": "Keep off"
+        }
+      }
     }
   }
 }
