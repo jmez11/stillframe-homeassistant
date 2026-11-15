@@ -17,7 +17,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup_entry(hass, entry):
     client = StillframeClient(async_get_clientsession(hass), entry.data[CONF_URL],
-                             entry.data[CONF_USERNAME], entry.data[CONF_PASSWORD])
+                             entry.data[CONF_USERNAME], entry.data.get(CONF_PASSWORD, ""))
     coordinator = StillframeCoordinator(hass, entry, client)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator

@@ -6,9 +6,8 @@ A HACS custom integration for local control of Stillframe photo frames. Each fra
 is a Home Assistant device. The integration communicates with its LAN API rather
 than reading another project's files or accessing Google Photos directly.
 
-The initial implementation targets **Stillframe Pi OS**. Stillframe Daydream and
-Stillframe Windows can implement the same [LAN API](docs/lan-api-v1.md) later;
-they are not yet supported or modified by this project.
+Supports **Stillframe Pi OS** and **Stillframe Daydream** through the shared
+[LAN API](docs/lan-api-v1.md). Stillframe Windows still needs the LAN API integration.
 
 ## Features
 
@@ -48,7 +47,9 @@ Download **Stillframe** and restart Home Assistant.
 Go to **Settings → Devices & services**. Configure the discovered Stillframe and
 enter its device password, or choose **Add integration → Stillframe** and enter
 its base URL, username (normally `admin`) and password. The frame password is
-different from the Home Assistant password.
+different from the Home Assistant password. Leave the password empty when
+**Require password** is off on the frame. This also applies when reauthenticating.
+Frames with password protection enabled still require the correct password.
 
 Discovery requires mDNS between Home Assistant and the frame. Separate VLANs
 need an mDNS reflector; manual setup works when discovery traffic is blocked.

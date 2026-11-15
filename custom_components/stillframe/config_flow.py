@@ -31,7 +31,7 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 # Verify the stable ID before following an address change.
                 try:
                     state = await StillframeClient(async_get_clientsession(self.hass), url,
-                                                   entry.data[CONF_USERNAME], entry.data[CONF_PASSWORD]).state()
+                                                   entry.data[CONF_USERNAME], entry.data.get(CONF_PASSWORD, "")).state()
                 except StillframeError:
                     return self.async_abort(reason="already_configured")
                 if state["device"]["id"] == entry.unique_id:
@@ -50,7 +50,7 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 client = StillframeClient(async_get_clientsession(self.hass), user_input[CONF_URL],
-                                          user_input[CONF_USERNAME], user_input[CONF_PASSWORD])
+                                          user_input[CONF_USERNAME], user_input.get(CONF_PASSWORD, ""))
                 state = await client.state()
             except StillframeAuthError:
                 errors["base"] = "invalid_auth"
@@ -60,12 +60,13 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(state["device"]["id"])
                 self._abort_if_unique_id_configured(updates={CONF_URL: client.url})
                 return self.async_create_entry(title=state["device"]["name"],
-                    data=defaults | user_input | {CONF_URL: client.url})
+                    data=defaults | user_input | {CONF_URL: client.url,
+                                                        CONF_PASSWORD: user_input.get(CONF_PASSWORD, "")})
             defaults = defaults | user_input
         return self.async_show_form(step_id="user", data_schema=vol.Schema({
             vol.Required(CONF_URL, default=defaults.get(CONF_URL, "http://stillframe.local:8080")): str,
             vol.Required(CONF_USERNAME, default=defaults.get(CONF_USERNAME, "admin")): str,
-            vol.Required(CONF_PASSWORD): selector.TextSelector(
+            vol.Optional(CONF_PASSWORD, default=""): selector.TextSelector(
                 selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)),
         }), errors=errors)
 
@@ -78,7 +79,7 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 state = await StillframeClient(async_get_clientsession(self.hass), entry.data[CONF_URL],
-                    entry.data[CONF_USERNAME], user_input[CONF_PASSWORD]).state()
+                    entry.data[CONF_USERNAME], user_input.get(CONF_PASSWORD, "")).state()
                 if state["device"]["id"] != entry.unique_id:
                     return self.async_abort(reason="wrong_device")
             except StillframeAuthError:
@@ -86,9 +87,10 @@ class StillframeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except StillframeError:
                 errors["base"] = "cannot_connect"
             else:
-                return self.async_update_reload_and_abort(entry, data_updates=user_input)
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input | {CONF_PASSWORD: user_input.get(CONF_PASSWORD, "")})
         return self.async_show_form(step_id="reauth_confirm", data_schema=vol.Schema({
-            vol.Required(CONF_PASSWORD): selector.TextSelector(
+            vol.Optional(CONF_PASSWORD, default=""): selector.TextSelector(
                 selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)),
         }), errors=errors)
 

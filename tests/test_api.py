@@ -17,12 +17,15 @@ STATE = {"api_version": 1, "device": {"id": "stable-id"}, "controls": {"power": 
 
 
 @pytest_asyncio.fixture
-async def frame():
+async def frame(request):
+    password_required = getattr(request, "param", True)
     state = copy.deepcopy(STATE)
 
     async def handle(request):
-        if request.headers.get("Authorization") != aiohttp.BasicAuth("admin", "test-password").encode():
+        if password_required and request.headers.get("Authorization") != aiohttp.BasicAuth("admin", "test-password").encode():
             return web.Response(status=401)
+        if not password_required:
+            assert "Authorization" not in request.headers
         if request.method == "POST":
             assert request.headers["X-Stillframe-Client"] == "homeassistant"
             state["controls"].update(await request.json())
@@ -72,3 +75,20 @@ async def test_unknown_version_and_missing_identity_are_rejected(frame):
 def test_rejects_invalid_urls_and_embedded_credentials(url):
     with pytest.raises(ValueError):
         api.normalize_url(url)
+
+
+@pytest.mark.parametrize("frame", [False], indirect=True)
+async def test_empty_password_reads_and_controls_without_authentication(frame):
+    client, _ = frame
+    passwordless = api.StillframeClient(client.session, client.url, "admin", "")
+    assert passwordless.auth is None
+    assert await passwordless.state() == STATE
+    updated = await passwordless.control(power="off")
+    assert updated["controls"]["power"] == "off"
+
+
+async def test_empty_password_still_fails_when_frame_requires_it(frame):
+    client, _ = frame
+    passwordless = api.StillframeClient(client.session, client.url, "admin", "")
+    with pytest.raises(api.StillframeAuthError):
+        await passwordless.state()

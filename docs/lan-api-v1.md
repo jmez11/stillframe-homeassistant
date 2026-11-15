@@ -1,8 +1,8 @@
 # Stillframe LAN API v1
 
 This contract is shared by the Home Assistant integration and each Stillframe
-implementation. The Pi is the initial reference implementation. Future Daydream
-support should implement these behaviors before advertising discovery.
+implementation. Pi OS and Daydream implement this contract; each platform
+should implement these behaviors before advertising discovery.
 
 ## Discovery and identity
 
@@ -18,8 +18,11 @@ this identity after authentication, deduplicates by it, and uses it for entities
 
 ## Authentication
 
-Both endpoints require HTTP Basic authentication with the frame credentials.
-Unauthenticated requests return 401. JSON commands also require
+When password protection is enabled on the frame, both endpoints require HTTP
+Basic authentication with the frame credentials; missing or incorrect credentials
+return 401. Frames may offer a local option to disable password protection. When
+that option is disabled, HA accepts an empty password and sends no Authorization
+header. JSON commands still require
 `X-Stillframe-Client: homeassistant`. No cross-origin browser access is allowed.
 Existing browser form routes retain session-based CSRF validation.
 

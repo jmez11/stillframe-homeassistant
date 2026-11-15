@@ -28,7 +28,7 @@ class StillframeClient:
     def __init__(self, session, url, username, password):
         self.session = session
         self.url = normalize_url(url)
-        self.auth = aiohttp.BasicAuth(username, password)
+        self.auth = aiohttp.BasicAuth(username, password) if password else None
 
     async def request(self, method, path, values=None):
         try:

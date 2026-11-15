@@ -5,18 +5,19 @@
     "step": {
       "user": {
         "title": "Connect Stillframe",
-        "description": "Enter the frame's web address and device credentials. The frame must support Stillframe LAN API v1.",
+        "description": "Enter the frame's web address and username. Leave the password empty when Require password is off on the frame. The frame must support Stillframe LAN API v1.",
         "data": {
           "url": "Frame URL",
           "username": "Username",
-          "password": "Frame password"
+          "password": "Frame password (optional when disabled on frame)"
         }
       },
       "reauth_confirm": {
         "title": "Update frame password",
         "data": {
-          "password": "Frame password"
-        }
+          "password": "Frame password (optional when disabled on frame)"
+        },
+        "description": "Enter the frame password, or leave it empty when Require password is off on the frame."
       }
     },
     "error": {
