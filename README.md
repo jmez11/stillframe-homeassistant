@@ -23,7 +23,8 @@ Supports **Stillframe Pi OS** and **Stillframe Daydream** through the shared
 **Keep stopped**. The two Keep choices ignore daily hours until you select
 **Follow daily hours** again. This controls photos and Pi display standby;
 Android controls TV panel sleep. Equal start/stop times allow playback all day.
-The old display switch is hidden but retained for existing automations.
+The old display switch has been removed. Update automations targeting that switch
+to use the Playback control selector (`auto`, `on`, or `off`).
 
 Album selection affects playback only. Every selected Google source continues to
 sync and retain its cache. Google album authorization/selection remains on the
@@ -154,7 +155,7 @@ Set album periods from **Developer tools → Actions**:
 ```yaml
 action: stillframe.set_album_periods
 target:
-  entity_id: switch.stillframe_display
+  entity_id: select.stillframe_power_mode
 data:
   periods:
     - start: "08:00"
